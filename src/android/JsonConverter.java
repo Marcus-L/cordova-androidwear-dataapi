@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Converts from Json to and from object model
@@ -74,7 +75,23 @@ class JsonConverter {
           val instanceof Boolean ||
           val instanceof Double ||
           val instanceof String) {
-        obj.put(key, val);
+        obj.put(key, val); // handle basic types
+      }
+      else if (val instanceof long[]) {
+        JSONArray arr = new JSONArray();
+        long[] valArr = (long[])val;
+        for (int j=0; j<valArr.length; j++) {
+          arr.put(valArr[j]);
+        }
+        obj.put(key,arr); // long[]
+      }
+      else if (val instanceof String[]) {
+        JSONArray arr = new JSONArray();
+        String[] valArr = (String[])val;
+        for (int j=0; j<valArr.length; j++) {
+          arr.put(valArr[j]);
+        }
+        obj.put(key,arr); // String[]
       }
       else if (val instanceof DataMap) {
         obj.put(key, dataMapToJson((DataMap)val));
