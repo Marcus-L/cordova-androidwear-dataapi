@@ -2,7 +2,7 @@ var _isString = function isString(x) {
     return Object.prototype.toString.call(x) === '[object String]';
 };
 // Helper method to execute Cordova native method
-var execNative = function (method, args, success, error) {
+var _execNative = function (method, args, success, error) {
     // provide default callbacks in case they were not provided
     var optSuccess = function(result) {
         if (success !== undefined) {
@@ -41,24 +41,24 @@ module.exports = {
         if (typeof handler !== "function") {
             throw "handler must be a function";
         }
-        return execNative("addListener", [], handler, function(err) { console.error(err); });
+        _execNative("addListener", [], handler, function(err) { console.error(err); });
     },
 
     putDataItem: function(path, data, success, error) {
-        return execNative("putDataItem", [path, data], success, error);
+        _execNative("putDataItem", [path, data], success, error);
     },
 
     getDataItems: function(uri, filterType, success, error) {
         if (filterType==undefined) {
             filterType = FILTER_LITERAL;
         }
-        return execNative("getDataItems", [uri, filterType], success, error);
+        _execNative("getDataItems", [uri, filterType], success, error);
     },
 
     deleteDataItems: function(uri, filterType, success, error) {
         if (filterType==undefined) {
             filterType = FILTER_LITERAL;
         }
-        return execNative("deleteDataItems", [uri, filterType], success, error);
+        _execNative("deleteDataItems", [uri, filterType], success, error);
     }
 }

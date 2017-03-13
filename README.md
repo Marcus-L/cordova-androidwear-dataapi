@@ -27,9 +27,9 @@ Read more at the documentation here: [https://developer.android.com/training/wea
 
 ### Cordova
 
-    $ cordova plugin add cordova-androidwear-dataapi --variable DATAAPI_PATH_FILTER="/"
+    $ cordova plugin add cordova-androidwear-dataapi --variable DATAAPI_PATHPREFIX="/"
 
-The `DATAAPI_PATH_FILTER` is optional and defaults to "/". Keep in mind that if you do not add a filter prefix that differentiates the phone from the Wear device, all data events put to the Android Wear network by your application will be captured by `addListener`, including data items put by the Cordova phone app.
+The `DATAAPI_PATHPREFIX` is optional and defaults to "/". Keep in mind that if you do not add a filter prefix that differentiates the phone from the Wear device, all data events put to the Android Wear network by your application will be captured by `addListener`, including data items put by the Cordova phone app.
 
 # API
 
@@ -156,12 +156,13 @@ Registers a listener to receive data item changed and deleted events.
 WearDataApi.addListener(function(events) {
     for (event in events) {
         console.log("event for : " + event.Uri);
-        console.log("data: " + event.Data)
         if (event.Type==WearDataApi.TYPE_CHANGED) {
             // handle change event
+            console.log(event.Data); // data is available here
         }
         else if (event.Type==WearDataApi.TYPE_DELETED) {
             // handle delete event
+            console.log(event.Data); // data is available for deleted items as well
         }
     }
 });
@@ -189,8 +190,8 @@ In this example, we add an WearableListenerService to the Wear app that will be 
 
 ```javascript
 var data = {
-    "id": 5, 
-    "values": [1,2,3], 
+    "id": 31337, 
+    "values": [3,1,4,5,9], 
     "nested": { "am_i_nested": true } 
 };
 WearDataApi.putDataItem("/my_path/test", data, <handlers>...);
@@ -208,8 +209,8 @@ public class MyService extends WearableListenerService {
             int type = event.getType(); // TYPE_CHANGED (1)
             DataItem item = event.getDataItem();
             DataMap data = DataMapItem.fromDataItem(item).getDataMap();
-            int id = data.getInt("id"); // 5
-            ArrayList<Integer> values = data.getIntegerArrayList("values"); // [1,2,3]
+            int id = data.getInt("id"); // 31337
+            ArrayList<Integer> values = data.getIntegerArrayList("values"); // [3,1,4,5,9]
             DataMap nested = data.getDataMap("nested");
             Boolean am_i_nested = nested.getBoolean("am_i_nested"); // true
         }
@@ -220,17 +221,21 @@ public class MyService extends WearableListenerService {
 ### Send Data back to Cordova from Android Wear native app (Java):
 
 ```java
-private GoogleApiClient client; // note: need a connected client first
+GoogleApiClient client; // note: need a connected client first
 
-public void SendDataBack() {
+void SendData() {
     // create base data map object
     PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/put_from_wear/1");
     DataMap dataMap = putDataMapRequest.getDataMap();
+
+    // add data using DataMap object model
     dataMap.putBoolean("foobar", true);
     dataMap.putStringArray("keys", new String[] {"a", "b", "c"});
     DataMap d2 = new DataMap();
     d2.putString("mach", "facula");
-    dataMap.putDataMap("bomb_baby", d2);
+    dataMap.putDataMap("bomb_baby", d2); // translated to nested Json object
+
+    // send data via Android Wear DataApi
     Wearable.DataApi.putDataItem(client, putDataMapRequest.asPutDataRequest());
 }
 ```

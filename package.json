@@ -19,14 +19,13 @@
     "Android",
     "Wearable",
     "ecosystem:cordova",
-    "Cordova"
+    "cordova-android"
   ],
-  "engines": [
-    {
-      "name": "Cordova",
-      "version": ">=5.1.0"
+  "engines": {
+    "cordovaDependencies": {
+      "1.0.0": { "cordova-android": ">5.1.0" }
     }
-  ],
+  },
   "author": "Marcus Lum",
   "license": "Apache 2.0",
   "bugs": {
