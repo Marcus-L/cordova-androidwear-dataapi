@@ -1,6 +1,6 @@
 # Android Wear DataApi for Cordova
 
-This plugin enables data synchronization between an Android Phone and an Android wear device via the [Android Wear DataApi](https://developers.google.com/android/reference/com/google/android/gms/wearable/DataApi). The plugin is only available for Android.
+This plugin enables data synchronization between an Android Phone and an Android wear device via the [Android Wear DataApi](https://developers.google.com/android/reference/com/google/android/gms/wearable/DataApi). With this API, you can:
 
 * Put data into the Data Layer
 * Query data from the Data Layer
@@ -19,7 +19,9 @@ Each data item is identified by a URI, accessible with getUri(), that indicates 
 
     wear://<node_id>/<path>
 
-There is a lower-level API which works with sending raw bytes which is not implemented. The implementation of this plugin translates Javascript objects into [`DataMap`](https://developers.google.com/android/reference/com/google/android/gms/wearable/DataMap) objects in Android. Read more at the documentation here: [https://developer.android.com/training/wearables/data-layer/data-items.html](https://developer.android.com/training/wearables/data-layer/data-items.html)
+There is a lower-level API which works with sending raw bytes which is not implemented. The implementation of this plugin translates Javascript objects into [`DataMap`](https://developers.google.com/android/reference/com/google/android/gms/wearable/DataMap) objects in Android for ease of use.
+
+Read more at the documentation here: [https://developer.android.com/training/wearables/data-layer/data-items.html](https://developer.android.com/training/wearables/data-layer/data-items.html)
 
 # Installing
 
@@ -33,10 +35,10 @@ The `DATAAPI_PATH_FILTER` is optional and defaults to "/". Keep in mind that if 
 
 ## Methods
 
-- [WearDataApi.putDataItem](#putDataItem)
-- [WearDataApi.getDataItems](#getDataItems)
-- [WearDataApi.deleteDataItems](#deleteDataItems)
-- [WearDataApi.addListener](#addlistener)
+- [WearDataApi.putDataItem](#weardataapiputdataitem)
+- [WearDataApi.getDataItems](#weardataapigetdataitems)
+- [WearDataApi.deleteDataItems](#weardataapideletedataitems)
+- [WearDataApi.addListener](#weardataapiaddlistener)
 
 ## WearDataApi.putDataItem
 
@@ -65,17 +67,21 @@ Adds a DataItem to the Android Wear network. The updated item is synchronized ac
 
 ### Example
 
-    var data = { "a": 123, "b": { "c": ["d"] } }
-    WearDataApi.putDataItem("/item_path/item123", data, function() {
-        // success callback
-    },
-    function(err) {
-        // error callback
-    })
+```javascript
+var data = { "a": 123, "b": { "c": ["d"] } }
+WearDataApi.putDataItem("/item_path/item123", data, function() {
+    // success callback
+},
+function(err) {
+    // error callback
+})
+```
 
 ## WearDataApi.getDataItems
 
-    getDataItems(uri, filterType, success, error) 
+```javascript
+getDataItems(uri, filterType, success, error)
+```
 
 ### Description
 
@@ -90,20 +96,24 @@ Retrieves all data items matching the provided URI, from the Android Wear networ
 
 ### Example
 
-    WearDataApi.getDataItems("wear://*/item_path", WearDataApi.FILTER_PREFIX, function(data) {
-        console.log(data);
-    })
-    // outputs:
-    [
-        { 
-            "Uri": "wear://abcd1234/item_path/item123",
-            "Data": { "a": 123, "b": { "c": ["d"] } }
-        }  
-    ]
+```javascript
+WearDataApi.getDataItems("wear://*/item_path", WearDataApi.FILTER_PREFIX, function(data) {
+    console.log(data);
+})
+// outputs:
+[
+    { 
+        "Uri": "wear://abcd1234/item_path/item123",
+        "Data": { "a": 123, "b": { "c": ["d"] } }
+    }  
+]
+```
 
 ## WearDataApi.deleteDataItems
 
-    deleteDataItems(uri, filterType, success, error)
+```javascript
+deleteDataItems(uri, filterType, success, error)
+```
 
 ### Description
 
@@ -118,15 +128,19 @@ Removes all specified data items from the Android Wear network.
 
 ### Example
 
-    WearDataApi.deleteDataItems("wear://*/item_path", WearDataApi.FILTER_PREFIX, function(result) {
-        console.log(result)
-    });
-    // outputs:
-    { "NumDeleted": 1 }
+```javascript
+WearDataApi.deleteDataItems("wear://*/item_path", WearDataApi.FILTER_PREFIX, function(result) {
+    console.log(result)
+});
+// outputs:
+{ "NumDeleted": 1 }
+```
 
 ## WearDataApi.addListener
 
-    addListener(handler);
+```javascript
+addListener(handler);
+```
 
 ### Description
 
@@ -138,18 +152,20 @@ Registers a listener to receive data item changed and deleted events.
 
 ### Example
 
-    WearDataApi.addListener(function(events) {
-        for (event in events) {
-            console.log("event for : " + event.Uri);
-            console.log("data: " + event.Data)
-            if (event.Type==WearDataApi.TYPE_CHANGED) {
-                // handle change event
-            }
-            else if (event.Type==WearDataApi.TYPE_DELETED) {
-                // handle delete event
-            }
+```javascript
+WearDataApi.addListener(function(events) {
+    for (event in events) {
+        console.log("event for : " + event.Uri);
+        console.log("data: " + event.Data)
+        if (event.Type==WearDataApi.TYPE_CHANGED) {
+            // handle change event
         }
-    });
+        else if (event.Type==WearDataApi.TYPE_DELETED) {
+            // handle delete event
+        }
+    }
+});
+```
 
 # Receiving Data from Android Wear
 
@@ -157,76 +173,84 @@ In this example, we add an WearableListenerService to the Wear app that will be 
 
 ### Add to AndroidManifest.xml
 
-    <manifest>
-        <application
-            <service android:name=".MyService">
-                <intent-filter>
-                    <action android:name="com.google.android.gms.wearable.DATA_CHANGED"/>
-                    <data android:scheme="wear" android:host="*" android:pathPrefix="/my_path"/>
-                </intent-filter>
-            </service>
-        </application>
-    </manifest>
-
+```xml
+<manifest>
+    <application
+        <service android:name=".MyService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/my_path"/>
+            </intent-filter>
+        </service>
+    </application>
+</manifest>
+```
 ### Send Data from Cordova:
 
-    var data = {
-        "id": 5, 
-        "values": [1,2,3], 
-        "nested": { "am_i_nested": true } 
-    };
-    WearDataApi.putDataItem("/my_path/test", data, <handlers>...);
+```javascript
+var data = {
+    "id": 5, 
+    "values": [1,2,3], 
+    "nested": { "am_i_nested": true } 
+};
+WearDataApi.putDataItem("/my_path/test", data, <handlers>...);
+```
 
 ### Receive Data in WearableListenerService (Java):
 
-    public class MyService extends WearableListenerService {
-        public MyService() { super("MyService"); } // constructor
+```java
+public class MyService extends WearableListenerService {
+    public MyService() { super("MyService"); } // constructor
 
-        @Override
-        public void onDataChanged(DataEventBuffer dataEventBuffer) {
-            for (DataEvent event : dataEventBuffer) {
-                int type = event.getType(); // TYPE_CHANGED (1)
-                DataItem item = event.getDataItem();
-                DataMap data = DataMapItem.fromDataItem(item).getDataMap();
-                int id = data.getInt("id"); // 5
-                ArrayList<Integer> values = data.getIntegerArrayList("values"); // [1,2,3]
-                DataMap nested = data.getDataMap("nested");
-                Boolean am_i_nested = nested.getBoolean("am_i_nested"); // true
-            }
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+        for (DataEvent event : dataEventBuffer) {
+            int type = event.getType(); // TYPE_CHANGED (1)
+            DataItem item = event.getDataItem();
+            DataMap data = DataMapItem.fromDataItem(item).getDataMap();
+            int id = data.getInt("id"); // 5
+            ArrayList<Integer> values = data.getIntegerArrayList("values"); // [1,2,3]
+            DataMap nested = data.getDataMap("nested");
+            Boolean am_i_nested = nested.getBoolean("am_i_nested"); // true
         }
     }
+}
+```
 
 ### Send Data back to Cordova from Android Wear native app (Java):
 
-    private GoogleApiClient client; // note: need a connected client first
+```java
+private GoogleApiClient client; // note: need a connected client first
 
-    public void SendDataBack() {
-        // create base data map object
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/put_from_wear/1");
-        DataMap dataMap = putDataMapRequest.getDataMap();
-        dataMap.putBoolean("foobar", true);
-        dataMap.putStringArray("keys", new String[] {"a", "b", "c"});
-        DataMap d2 = new DataMap();
-        d2.putString("mach", "facula");
-        dataMap.putDataMap("bomb_baby", d2);
-        Wearable.DataApi.putDataItem(client, putDataMapRequest.asPutDataRequest());
-    }
+public void SendDataBack() {
+    // create base data map object
+    PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/put_from_wear/1");
+    DataMap dataMap = putDataMapRequest.getDataMap();
+    dataMap.putBoolean("foobar", true);
+    dataMap.putStringArray("keys", new String[] {"a", "b", "c"});
+    DataMap d2 = new DataMap();
+    d2.putString("mach", "facula");
+    dataMap.putDataMap("bomb_baby", d2);
+    Wearable.DataApi.putDataItem(client, putDataMapRequest.asPutDataRequest());
+}
+```
 
 ### Received in Cordova:
 
-    WearDataApi.addListener(function(events) { console.log(events) }); // register listener
+```javascript
+WearDataApi.addListener(function(events) { console.log(events) }); // register listener
 
-    // outputs the object received from the callback:
-    [
-        {
-            "foobar": true,
-            "keys": ["a", "b", "c"],
-            "bomb_baby": {
-                "mach": "facula"
-            }
+// outputs the object received from the callback:
+[
+    {
+        "foobar": true,
+        "keys": ["a", "b", "c"],
+        "bomb_baby": {
+            "mach": "facula"
         }
-    ]
-
+    }
+]
+```
 
 ## License
 
