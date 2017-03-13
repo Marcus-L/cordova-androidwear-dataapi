@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="cordova-androidwear-dataapi"
+    version="1.0.0">
+
+    <name>Android Wear DataApi</name>
+    <description>Android Wear DataApi plugin for Apache Cordova (or PhoneGap/Ionic)</description>
+    <author>Marcus Lum</author>
+    <license>Apache 2.0</license>
+    <keywords>Wear, DataApi, AndroidWear, Android, Wearable</keywords>
+    <repo>https://github.com/Marcus-L/cordova-androidwear-dataapi.git</repo>
+    <issue>https://github.com/Marcus-L/cordova-androidwear-dataapi/issues</issue>
+    
+    <engines>
+        <engine name="cordova-android" version=">=5.1.0" />
+    </engines>
+    
+    <platform name="android">
+        <preference name="DATAAPI_PATH_FILTER" default="/"/>
+        <framework src="com.google.android.gms:play-services-base:+" />
+        <framework src="com.google.android.gms:play-services-wearable:+" />
+    
+        <js-module src="www/wear-data-api.js" name="WearDataAPI">
+            <clobbers target="WearDataApi" />
+        </js-module>
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="WearDataApi">
+                <param name="android-package" value="us.m4rc.cordova.androidwear.dataapi.WearDataApiPlugin"/>
+            </feature>
+        </config-file>
+        
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <service android:name="us.m4rc.cordova.androidwear.dataapi.WearDataApiService" android:enabled="true">
+                <intent-filter>
+                    <action android:name="com.google.android.gms.wearable.DATA_CHANGED"/>
+                    <data android:scheme="wear" android:host="*" android:pathPrefix="$DATAAPI_PATH_FILTER"/>
+                </intent-filter>
+            </service>
+        </config-file>
+
+        <source-file src="src/android/JsonConverter.java" target-dir="src/us/m4rc/cordova/androidwear/dataapi"/>
+        <source-file src="src/android/WearDataAPIPlugin.java" target-dir="src/us/m4rc/cordova/androidwear/dataapi"/>
+        <source-file src="src/android/WearDataAPIService.java" target-dir="src/us/m4rc/cordova/androidwear/dataapi"/>
+    </platform>
+</plugin>

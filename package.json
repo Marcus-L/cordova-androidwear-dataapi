@@ -1,0 +1,36 @@
+{
+  "name": "cordova-androidwear-dataapi",
+  "version": "1.0.0",
+  "description": "Android Wear DataApi plugin for Apache Cordova (or PhoneGap/Ionic)",
+  "cordova": {
+    "id": "cordova-androidwear-dataapi",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marcus-L/cordova-androidwear-dataapi.git"
+  },
+  "keywords": [
+    "Wear",
+    "DataApi",
+    "AndroidWear",
+    "Android",
+    "Wearable",
+    "ecosystem:cordova",
+    "Cordova"
+  ],
+  "engines": [
+    {
+      "name": "Cordova",
+      "version": ">=5.1.0"
+    }
+  ],
+  "author": "Marcus Lum",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/Marcus-L/cordova-androidwear-dataapi/issues"
+  },
+  "homepage": "https://github.com/Marcus-L/cordova-androidwear-dataapi"
+}
