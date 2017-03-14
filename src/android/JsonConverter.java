@@ -2,9 +2,6 @@ package us.m4rc.cordova.androidwear.dataapi;
 
 //import android.util.Log;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
@@ -17,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Converts from Json to and from object model
@@ -42,7 +38,7 @@ class JsonConverter {
         // add the event type to the return value
         json.put("Type", dataEvent.getType());
       }
-      catch (Exception ex) {}
+      catch (Exception ignored) {}
       results.put(json);
     }
     return results;
@@ -66,7 +62,7 @@ class JsonConverter {
     return json;
   }
 
-  static JSONObject dataMapToJson(DataMap dataMap) throws JSONException {
+  private static JSONObject dataMapToJson(DataMap dataMap) throws JSONException {
     JSONObject obj = new JSONObject();
     for (String key: dataMap.keySet()) {
       Object val = dataMap.get(key);
@@ -80,16 +76,16 @@ class JsonConverter {
       else if (val instanceof long[]) {
         JSONArray arr = new JSONArray();
         long[] valArr = (long[])val;
-        for (int j=0; j<valArr.length; j++) {
-          arr.put(valArr[j]);
+        for (long aValArr : valArr) {
+          arr.put(aValArr);
         }
         obj.put(key,arr); // long[]
       }
       else if (val instanceof String[]) {
         JSONArray arr = new JSONArray();
         String[] valArr = (String[])val;
-        for (int j=0; j<valArr.length; j++) {
-          arr.put(valArr[j]);
+        for (String aValArr : valArr) {
+          arr.put(aValArr);
         }
         obj.put(key,arr); // String[]
       }
