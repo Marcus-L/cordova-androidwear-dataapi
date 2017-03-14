@@ -1,14 +1,9 @@
 package us.m4rc.cordova.androidwear.dataapi;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.Uri;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.api.PendingResult;
@@ -37,6 +32,8 @@ import static com.google.android.gms.wearable.DataApi.FILTER_LITERAL;
 public class WearDataApiPlugin extends CordovaPlugin
     implements DataApi.DataListener {
 
+  public static WearDataApiPlugin WearDataApiPluginSingleton = null;
+
   private final String TAG = WearDataApiPlugin.class.getSimpleName();
   private final String[] ACTIONS = {
     "putDataItem",
@@ -44,7 +41,6 @@ public class WearDataApiPlugin extends CordovaPlugin
     "deleteDataItems",
     "addListener"
   };
-  private WearDataApiService api = null;
 
   // keep the callbacks for all registered receivers
   private Queue<CallbackContext> registeredListeners = new LinkedList<CallbackContext>();
@@ -65,27 +61,22 @@ public class WearDataApiPlugin extends CordovaPlugin
     }
   }
 
-  private ServiceConnection conn = new ServiceConnection() {
-    public void onServiceConnected(ComponentName className, IBinder service) {
-      api = ((WearDataApiService.LocalBinder)service).getService();
-      api.setDataEventHandler(WearDataApiPlugin.this);
-      Log.d(TAG, "service connected with binder: " + api.getClass().toString());
+  private WearDataApiService api() {
+    return WearDataApiService.WearDataApiServiceSingleton;
+  }
 
-      // run all queued actions
-      while (queuedActions.size() > 0) {
-        ExecuteAction ea = queuedActions.remove();
-        try {
-          _execute(ea);
-        }
-        catch (Exception ex) {
-          ea.callbackContext.error(ex.getMessage());
-        }
+  public void onServiceStarted() {
+    // run all queued actions
+    while (queuedActions.size() > 0) {
+      ExecuteAction ea = queuedActions.remove();
+      try {
+        _execute(ea);
+      }
+      catch (Exception ex) {
+        ea.callbackContext.error(ex.getMessage());
       }
     }
-    public void onServiceDisconnected(ComponentName className) {
-      Log.d(TAG, "service disconnected from " + className.toShortString());
-    }
-  };
+  }
 
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -93,8 +84,20 @@ public class WearDataApiPlugin extends CordovaPlugin
     Log.d(TAG, "WearDataApiPlugin initialized.");
 
     Activity context = cordova.getActivity();
-    Intent serviceIntent = new Intent(context, WearDataApiService.class);
-    context.bindService(serviceIntent, conn, Context.BIND_AUTO_CREATE);
+    WearDataApiPluginSingleton = this;
+    context.startService(new Intent(context, WearDataApiService.class));
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    WearDataApiPluginSingleton = null; // if we are called gracefully
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    WearDataApiPluginSingleton = null; // when we are garbage collected
   }
 
   @Override
@@ -104,7 +107,7 @@ public class WearDataApiPlugin extends CordovaPlugin
       return false;
     }
     ExecuteAction ea = new ExecuteAction(action,args,callbackContext);
-    if (api!=null) {
+    if (this.api()!=null) {
       try {
         _execute(ea); // run immediately if already connected
       }
@@ -149,7 +152,7 @@ public class WearDataApiPlugin extends CordovaPlugin
     }
     PutDataMapRequest putDataMapReq = PutDataMapRequest.create(args.getString(0));
     JsonConverter.jsonToDataMap((JSONObject)args.get(1), putDataMapReq.getDataMap());
-    api.putDataRequest(putDataMapReq.asPutDataRequest())
+    this.api().putDataRequest(putDataMapReq.asPutDataRequest())
       .then(new ResultTransform<DataApi.DataItemResult, Result>() {
         @Override
         public PendingResult<Result> onSuccess(@NonNull DataApi.DataItemResult dataItemResult) {
@@ -169,22 +172,22 @@ public class WearDataApiPlugin extends CordovaPlugin
       filterType = args.getInt(1);
     }
     if (cmd.equals("get")) {
-      api.getDataItems(uri, filterType).then(new ResultTransform<DataItemBuffer, Result>() {
+      this.api().getDataItems(uri, filterType).then(new ResultTransform<DataItemBuffer, Result>() {
         @Override
-        public PendingResult<Result> onSuccess(DataItemBuffer dataItems) {
+        public PendingResult<Result> onSuccess(@NonNull DataItemBuffer dataItems) {
           callbackContext.success(JsonConverter.dataItemBufferToJson(dataItems));
           return null;
         }
       });
     } else if (cmd.equals("delete")) {
-      api.deleteDataItems(uri, filterType).then(new ResultTransform<DataApi.DeleteDataItemsResult, Result>() {
+      this.api().deleteDataItems(uri, filterType).then(new ResultTransform<DataApi.DeleteDataItemsResult, Result>() {
         @Override
-        public PendingResult<Result> onSuccess(DataApi.DeleteDataItemsResult deleteResult) {
+        public PendingResult<Result> onSuccess(@NonNull DataApi.DeleteDataItemsResult deleteResult) {
           JSONObject json = new JSONObject();
           try {
             json.put("NumDeleted", deleteResult.getNumDeleted());
           }
-          catch (Exception ex) {}
+          catch (Exception ignored) {}
           callbackContext.success(json);
           return null;
         }
