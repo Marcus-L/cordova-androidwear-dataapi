@@ -38,6 +38,7 @@ public class WearDataApiService extends WearableListenerService
     if (mGoogleApiClient==null) {
       mGoogleApiClient = new GoogleApiClient.Builder(this)
         .addApi(Wearable.API)
+        .addConnectionCallbacks(this)
         .build();
     }
     if (!mGoogleApiClient.isConnected()) {
