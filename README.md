@@ -168,11 +168,24 @@ WearDataApi.addListener(function(events) {
 });
 ```
 
-# Receiving Data from Android Wear
+# Receiving Data in Android Wear
 
-In this example, we add an WearableListenerService to the Wear app that will be created and invoked when a Data Item matches the given `host` and `pathPrefix` values:
+### Data Sent from Cordova:
 
-### Add to AndroidManifest.xml
+Here is some sample data sent from Cordova using this plugin:
+
+```javascript
+var data = {
+    "id": 31337, 
+    "values": [3,1,4,5,9], 
+    "nested": { "am_i_nested": true } 
+};
+WearDataApi.putDataItem("/my_path/test", data, <handlers>...);
+```
+
+In this example, we add an WearableListenerService to an Android Wear app that will be created and invoked when a Data Item event URI matches the configured `host` ("*") and `pathPrefix` ("/my_path") values:
+
+### Add to Wear App's AndroidManifest.xml
 
 ```xml
 <manifest>
@@ -186,18 +199,8 @@ In this example, we add an WearableListenerService to the Wear app that will be 
     </application>
 </manifest>
 ```
-### Send Data from Cordova:
 
-```javascript
-var data = {
-    "id": 31337, 
-    "values": [3,1,4,5,9], 
-    "nested": { "am_i_nested": true } 
-};
-WearDataApi.putDataItem("/my_path/test", data, <handlers>...);
-```
-
-### Receive Data in WearableListenerService (Java):
+### Receive Data in Wear App's WearableListenerService (Java):
 
 ```java
 public class MyService extends WearableListenerService {
@@ -218,7 +221,7 @@ public class MyService extends WearableListenerService {
 }
 ```
 
-### Send Data back to Cordova from Android Wear native app (Java):
+### Send Data back to Cordova from Android Wear App (Java):
 
 ```java
 GoogleApiClient client; // note: need a connected client first
@@ -240,7 +243,7 @@ void SendData() {
 }
 ```
 
-### Received in Cordova:
+### Data will be received in Cordova:
 
 ```javascript
 WearDataApi.addListener(function(events) { console.log(events) }); // register listener
