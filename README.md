@@ -264,7 +264,15 @@ WearDataApi.addListener(function(events) { console.log(events) }); // register l
 ]
 ```
 
-## License
+# Limitations
+
+## Data Change Events when the Cordova Activity has been killed
+
+When the Cordova Activity is killed (either by the user manually or by the system automatically due to resource conservation), the CordovaWebView is destroyed and the Javascript code is not runnable. DataApi events received while the activity is killed are not received by callbacks registered with `WearDataApi.addListener`.
+
+TODO in the future would be to have the plugin do a native `sendBroadcast(intent)` when data events are received and have apps wanting to handle data events while the Cordova Activity is killed add a native `BroadcastReceiver` to the app. This technique is implemented by (and described by) the __cordova-plugin-geofence__ plugin here: [https://github.com/cowbell/cordova-plugin-geofence#listening-for-geofence-transitions-in-native-code](https://github.com/cowbell/cordova-plugin-geofence#listening-for-geofence-transitions-in-native-code)
+
+# License
 
 Copyright (c) 2017 Marcus Lum
 
