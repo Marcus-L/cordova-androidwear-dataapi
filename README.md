@@ -46,7 +46,7 @@ The `DATAAPI_PATHPREFIX` is optional and defaults to "/". Keep in mind that if y
 
 ### Description
 
-Adds a DataItem to the Android Wear network. The updated item is synchronized across all devices.
+Adds a DataItem to the Android Wear network. The updated item is synchronized across all devices. When you put data items you do not specify the full URI including the host (only the path), because the host is provided by the Android DataApi for the device putting the data.
 
 *Note: calling this method multiple times with the same data will cause change events only once.*
 
@@ -103,7 +103,7 @@ WearDataApi.getDataItems("wear://*/item_path", WearDataApi.FILTER_PREFIX, functi
 // outputs:
 [
     { 
-        "Uri": "wear://abcd1234/item_path/item123",
+        "Uri": "wear://<node_id>/item_path/item123",
         "Data": { "a": 123, "b": { "c": ["d"] } }
     }  
 ]
@@ -166,6 +166,15 @@ WearDataApi.addListener(function(events) {
         }
     }
 });
+// example format of the events array:
+[
+    {
+        "Data": { /* the data contained at the URI */ },
+        "Type": EVENT_TYPE, // (either WearDataApi.TYPE_CHANGED or WearDataApi.TYPE_DELETED)
+        "Uri": "wear://<wear_node_id>/<path>"
+    },
+    { /*another event*/ }, ...
+]
 ```
 
 # Receiving Data in Android Wear
