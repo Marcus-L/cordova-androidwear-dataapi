@@ -251,11 +251,15 @@ WearDataApi.addListener(function(events) { console.log(events) }); // register l
 // outputs the object received from the callback:
 [
     {
-        "foobar": true,
-        "keys": ["a", "b", "c"],
-        "bomb_baby": {
-            "mach": "facula"
-        }
+        "Data": {
+            "foobar": true,
+            "keys": ["a", "b", "c"],
+            "bomb_baby": {
+                "mach": "facula"
+            }
+        },
+        "Type": 1,
+        "Uri": "wear://<wear_node_id>/put_from_wear/1"
     }
 ]
 ```
