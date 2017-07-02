@@ -24,7 +24,9 @@ public class WearDataApiService extends WearableListenerService
   @Override
   public void onConnected(@Nullable Bundle bundle) {
     Log.d(TAG, "Google API Client connected");
-    WearDataApiPlugin.WearDataApiPluginSingleton.onServiceStarted();
+    if (WearDataApiPlugin.WearDataApiPluginSingleton != null) {
+      WearDataApiPlugin.WearDataApiPluginSingleton.onServiceStarted();
+    }
   }
 
   @Override

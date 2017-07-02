@@ -1,6 +1,6 @@
 {
   "name": "cordova-androidwear-dataapi",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Android Wear DataApi plugin for Apache Cordova (or PhoneGap/Ionic)",
   "cordova": {
     "id": "cordova-androidwear-dataapi",
